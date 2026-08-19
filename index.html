@@ -1,3498 +1,922 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#070a16">
-<title>Klobop — Free Worlds</title>
+<meta name="theme-color" content="#070914">
+<title>Klobop</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:#060814;color:#fff;font-family:Arial,Helvetica,sans-serif;touch-action:none}
-button{font:inherit;color:#fff;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-#app{position:fixed;inset:0;z-index:5;pointer-events:none}
-.panel{pointer-events:auto;background:linear-gradient(145deg,#151d42ee,#080c1dee);border:1px solid #ffffff20;box-shadow:0 15px 50px #0008;backdrop-filter:blur(12px)}
-#top{display:none;position:absolute;top:10px;left:10px;right:10px;align-items:center;justify-content:space-between;gap:8px}
-.hud{padding:9px 12px;border-radius:14px;font-size:13px;font-weight:900}
-#placeName{max-width:35vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#homeBtn{background:#ffffff12;padding:9px 12px;border-radius:12px}
-#coins{color:#ffe34c}
-#menu{position:fixed;inset:0;z-index:20;overflow:auto;text-align:center;padding:28px 14px 50px;background:radial-gradient(circle at 50% 8%,#344bb2,#111638 35%,#050711 80%)}
-.logo{font-size:clamp(54px,11vw,110px);font-weight:1000;font-style:italic;letter-spacing:-7px;text-shadow:0 0 18px #5ceaff,0 7px #11152e;transform:skew(-7deg)}
-.logo span{color:#48eaff}
-.tag{margin:8px 0 22px;opacity:.65;letter-spacing:5px;font-size:12px}
-.bigbtn,.smallbtn{border-radius:15px;padding:13px 20px;font-weight:1000;background:linear-gradient(135deg,#23dcff,#6354ff);box-shadow:0 5px #151a45}
-.bigbtn{font-size:18px;margin-bottom:20px}
-.bigbtn:active,.smallbtn:active{transform:translateY(3px);box-shadow:0 2px #151a45}
-.menuRow{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-bottom:14px}
-.smallbtn{font-size:13px}
-#profile{margin:0 auto 16px;padding:12px;border-radius:16px;width:min(900px,95vw);display:flex;justify-content:center;gap:22px;flex-wrap:wrap}
-.stat b{color:#50eaff}
-.sectionTitle{font-size:20px;margin:18px 0 10px;font-weight:1000}
-#places{width:min(1050px,96vw);margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-.place{min-height:145px;border-radius:20px;padding:15px;text-align:left;background:linear-gradient(145deg,#1a2860,#0a102a);border:2px solid #ffffff16;position:relative;overflow:hidden;transition:.15s}
-.place:hover{transform:translateY(-3px);border-color:#42eaff88}
-.place h3{font-size:20px;margin-bottom:7px}
-.place p{font-size:12px;line-height:1.45;opacity:.72}
-.place .emoji{font-size:42px;position:absolute;right:12px;bottom:8px;filter:drop-shadow(0 0 12px #fff5)}
-.place .go{position:absolute;right:12px;top:12px;padding:6px 9px;border-radius:9px;background:#ffffff12;font-size:10px;font-weight:900}
-#modal{display:none;position:fixed;inset:0;z-index:30;background:#02040dcc;backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:18px}
-.modalBox{width:min(650px,95vw);max-height:88vh;overflow:auto;padding:22px;border-radius:22px}
-.close{float:right;background:#ffffff12;border-radius:10px;padding:7px 10px}
-.itemGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-top:15px}
-.item{padding:12px;border-radius:15px;background:#ffffff09;border:1px solid #ffffff15;text-align:center}
-.item .icon{font-size:34px;margin-bottom:7px}
-.item button{margin-top:8px;padding:7px 10px;border-radius:9px;background:#28cfe8;color:#061020;font-weight:900;font-size:11px}
-#touch{display:none;position:fixed;z-index:8;inset:auto 15px 15px 15px;justify-content:space-between;pointer-events:none}
-.touchGroup{display:flex;gap:9px}
-.touchBtn{pointer-events:auto;width:64px;height:64px;border-radius:18px;background:#111b3ddd;border:2px solid #ffffff18;font-size:25px;font-weight:1000}
-@media(max-width:700px){
-#touch{display:flex}
-#profile{gap:12px}
-#places{grid-template-columns:repeat(2,1fr)}
-.place{min-height:125px}
-.place h3{font-size:15px}
-.place p{font-size:10px}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070914;color:#fff;font-family:Inter,Arial,sans-serif}
+body{user-select:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+
+#ui{position:fixed;inset:0;z-index:10;pointer-events:none}
+button,.click{pointer-events:auto}
+
+#menu{
+ position:absolute;inset:0;overflow:auto;
+ padding:28px 18px 50px;
+ background:
+ radial-gradient(circle at 15% 15%,#613cff55,transparent 28%),
+ radial-gradient(circle at 85% 20%,#00eaff38,transparent 25%),
+ linear-gradient(145deg,#090b19,#11162c 50%,#060710);
+ animation:appear .5s ease
+}
+@keyframes appear{from{opacity:0;transform:scale(1.02)}to{opacity:1;transform:none}}
+
+.logo{
+ width:max-content;margin:20px auto 3px;
+ font-size:clamp(55px,12vw,115px);
+ font-weight:1000;letter-spacing:-8px;
+ font-style:italic;
+ background:linear-gradient(90deg,#fff,#5eefff,#9670ff,#fff);
+ background-size:300%;
+ -webkit-background-clip:text;color:transparent;
+ animation:logo 5s linear infinite;
+ filter:drop-shadow(0 0 20px #39eaff55)
+}
+@keyframes logo{to{background-position:300%}}
+
+.subtitle{text-align:center;color:#8790b7;letter-spacing:5px;font-size:11px;margin-bottom:25px}
+
+.topButtons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+
+.btn{
+ border:1px solid #ffffff1c;
+ border-radius:14px;
+ padding:12px 17px;
+ color:#fff;
+ font-weight:900;
+ background:#ffffff0d;
+ box-shadow:0 8px 30px #0004;
+ transition:.15s;
+}
+.btn:hover{transform:translateY(-3px);background:#ffffff18;border-color:#53eaff77}
+.btn:active{transform:translateY(1px) scale(.98)}
+.primary{
+ background:linear-gradient(135deg,#00d9ff,#6d4cff);
+ border:0;
+ box-shadow:0 0 30px #4a70ff55;
+}
+
+.stats{
+ width:min(900px,96vw);
+ margin:auto;
+ display:flex;justify-content:center;gap:10px;flex-wrap:wrap
+}
+.stat{
+ min-width:125px;padding:12px 18px;border-radius:17px;
+ background:#ffffff09;border:1px solid #ffffff12;
+ backdrop-filter:blur(12px)
+}
+.stat small{display:block;color:#858dae;font-size:10px}
+.stat b{font-size:19px}
+
+.title{
+ text-align:center;font-size:25px;font-weight:1000;margin:30px 0 14px
+}
+
+#places{
+ width:min(1100px,96vw);
+ margin:auto;
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+ gap:13px
+}
+
+.place{
+ position:relative;
+ min-height:170px;
+ padding:18px;
+ text-align:left;
+ overflow:hidden;
+ border-radius:23px;
+ border:1px solid #ffffff18;
+ background:linear-gradient(145deg,#151b38dd,#080b19ee);
+ box-shadow:0 12px 40px #0006;
+ transition:.22s;
+}
+.place:hover{transform:translateY(-7px) scale(1.015);border-color:#5beaff66}
+.place:active{transform:scale(.98)}
+.place:before{
+ content:"";
+ position:absolute;
+ width:130px;height:130px;
+ right:-45px;top:-45px;
+ border-radius:50%;
+ background:var(--c);
+ filter:blur(45px);
+ opacity:.35;
+}
+.placeIcon{font-size:48px;position:relative}
+.place h3{margin:9px 0 7px;font-size:20px;position:relative}
+.place p{margin:0;color:#9299b8;font-size:12px;line-height:1.45;position:relative}
+.playTag{
+ position:absolute;right:13px;bottom:13px;
+ padding:7px 10px;border-radius:10px;
+ background:#ffffff0c;color:#7eeeff;
+ font-size:10px;font-weight:1000
+}
+
+#gameUI{
+ display:none;
+ position:absolute;inset:0;
+ pointer-events:none
+}
+#hud{
+ position:absolute;top:14px;left:14px;right:14px;
+ display:flex;align-items:center;justify-content:space-between;gap:8px
+}
+.hudbox{
+ padding:10px 13px;border-radius:14px;
+ background:#080d20cc;border:1px solid #ffffff18;
+ backdrop-filter:blur(10px);
+ box-shadow:0 8px 30px #0005;
+ font-weight:900
+}
+#gameTitle{max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#back{
+ pointer-events:auto;
+ background:#ffffff12;
+ border:1px solid #ffffff18;
+ border-radius:12px;
+ padding:9px 12px;color:white;font-weight:900
+}
+
+#mobile{
+ position:absolute;left:15px;right:15px;bottom:15px;
+ display:flex;justify-content:space-between;
+ pointer-events:none
+}
+.mgroup{display:flex;gap:9px}
+.mbtn{
+ pointer-events:auto;
+ width:62px;height:62px;
+ border-radius:18px;
+ background:#0b1230dd;
+ border:1px solid #ffffff20;
+ color:#fff;font-size:24px;font-weight:1000;
+ box-shadow:0 8px 25px #0006;
+ touch-action:none
+}
+.mbtn:active{transform:scale(.92);background:#2444aadd}
+
+#modal{
+ display:none;position:absolute;inset:0;
+ background:#0009;backdrop-filter:blur(9px);
+ align-items:center;justify-content:center;
+ padding:18px;
+ pointer-events:auto
+}
+.modal{
+ width:min(650px,95vw);max-height:85vh;overflow:auto;
+ border-radius:24px;padding:22px;
+ background:linear-gradient(145deg,#171d3b,#080b18);
+ border:1px solid #ffffff20;
+ box-shadow:0 25px 100px #000;
+}
+.modal h2{margin:0 0 10px}
+.close{float:right}
+.items{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:16px}
+.item{padding:15px;border-radius:16px;background:#ffffff08;border:1px solid #ffffff12;text-align:center}
+.itemIcon{font-size:38px}
+.item button{margin-top:9px;padding:7px 10px;border:0;border-radius:9px;background:#40dfff;color:#06101c;font-weight:900}
+
+.toast{
+ position:absolute;left:50%;top:80px;
+ transform:translateX(-50%) translateY(-20px);
+ opacity:0;
+ padding:12px 18px;border-radius:14px;
+ background:#111936ee;border:1px solid #ffffff20;
+ transition:.25s;white-space:nowrap
+}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+@media(max-width:600px){
+ #places{grid-template-columns:repeat(2,1fr);gap:9px}
+ .place{min-height:145px;padding:13px}
+ .placeIcon{font-size:35px}
+ .place h3{font-size:15px}
+ .place p{font-size:10px}
+ .stat{min-width:100px}
 }
 </style>
 </head>
-
 <body>
 
-<canvas id="c"></canvas>
+<canvas id="canvas"></canvas>
 
-<div id="app">
+<div id="ui">
 
-<div id="top">
+<section id="menu">
 
-<div class="hud panel" id="placeName">
-Klobop
+<div class="logo">Klobop</div>
+<div class="subtitle">FREE WORLDS • PLAY • CREATE • EXPLORE</div>
+
+<div class="topButtons">
+<button class="btn primary" id="randomBtn">⚡ СЛУЧАЙНЫЙ ПЛЕЙС</button>
+<button class="btn" id="shopBtn">🛍️ МАГАЗИН</button>
+<button class="btn" id="invBtn">🎒 ИНВЕНТАРЬ</button>
+<button class="btn" id="nameBtn">✏️ ИМЯ</button>
 </div>
 
-<div class="hud panel">
-💰 <span id="coins">0</span>
+<div class="stats">
+<div class="stat"><small>ИГРОК</small><b id="name">Klobop</b></div>
+<div class="stat"><small>МОНЕТЫ</small><b>💰 <span id="coins">250</span></b></div>
+<div class="stat"><small>XP</small><b>⭐ <span id="xp">0</span></b></div>
+<div class="stat"><small>ПОБЕДЫ</small><b>🏆 <span id="wins">0</span></b></div>
 </div>
 
-<div class="hud panel">
-⭐ <span id="xp">0</span>
-</div>
-
-<button id="homeBtn" class="panel">
-☰
-</button>
-
-</div>
-
-<div id="touch">
-
-<div class="touchGroup">
-<button class="touchBtn" id="left">◀</button>
-<button class="touchBtn" id="right">▶</button>
-</div>
-
-<div class="touchGroup">
-<button class="touchBtn" id="jump">↑</button>
-<button class="touchBtn" id="action">●</button>
-</div>
-
-</div>
-
-</div>
-
-
-<div id="menu">
-
-<div class="logo">
-Klo<span>bop</span>
-</div>
-
-<div class="tag">
-FREE WORLDS • PLAY • CREATE • EXPLORE
-</div>
-
-<button class="bigbtn" id="play">
-▶ ИГРАТЬ
-</button>
-
-<div id="profile" class="panel">
-
-<div class="stat">
-Игрок <b id="playerName">Klobop</b>
-</div>
-
-<div class="stat">
-💰 <b id="menuCoins">0</b>
-</div>
-
-<div class="stat">
-⭐ <b id="menuXP">0</b>
-</div>
-
-<div class="stat">
-🏆 <b id="wins">0</b>
-</div>
-
-</div>
-
-<div class="menuRow">
-
-<button class="smallbtn" id="shop">
-🛍️ БЕСПЛАТНЫЙ МАГАЗИН
-</button>
-
-<button class="smallbtn" id="inventory">
-🎒 ИНВЕНТАРЬ
-</button>
-
-<button class="smallbtn" id="nameBtn">
-✏️ ИМЯ
-</button>
-
-<button class="smallbtn" id="reset">
-↻ СБРОС
-</button>
-
-</div>
-
-<div class="sectionTitle">
-🌎 PLACES
-</div>
-
+<div class="title">🌎 Выбери свой мир</div>
 <div id="places"></div>
 
+</section>
+
+
+<section id="gameUI">
+
+<div id="hud">
+<div class="hudbox" id="gameTitle">Klobop</div>
+<div class="hudbox">💰 <span id="gameCoins">250</span> &nbsp; ⭐ <span id="gameXP">0</span></div>
+<button id="back">☰ Меню</button>
 </div>
+
+<div class="toast" id="toast"></div>
+
+<div id="mobile">
+<div class="mgroup">
+<button class="mbtn" id="left">◀</button>
+<button class="mbtn" id="right">▶</button>
+</div>
+<div class="mgroup">
+<button class="mbtn" id="jump">↑</button>
+<button class="mbtn" id="act">●</button>
+</div>
+</div>
+
+</section>
 
 
 <div id="modal">
-
-<div class="modalBox panel">
-
-<button class="close" id="close">
-✕
-</button>
-
-<h2 id="modalTitle">
-Klobop
-</h2>
-
+<div class="modal">
+<button class="btn close" id="close">✕</button>
+<h2 id="modalTitle"></h2>
 <div id="modalContent"></div>
-
+</div>
 </div>
 
 </div>
-
 
 <script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
 
-"use strict";
-
-
-/* =========================
-   SAVE
-========================= */
-
-const KEY="KLOBOP_FREE_WORLD_V1";
-
-let save={
-name:"Klobop",
-coins:250,
-xp:0,
-wins:0,
-items:["default"],
-equipped:"default"
-};
-
-try{
-
-const x=JSON.parse(
-localStorage.getItem(KEY)
-);
-
-if(x){
-save={
-...save,
-...x
-};
-}
-
-}catch(e){}
-
-
-function persist(){
-
-try{
-
-localStorage.setItem(
-KEY,
-JSON.stringify(save)
-);
-
-}catch(e){}
-
-}
-
-
-/* =========================
-   PLACES
-========================= */
-
-const places=[
-
-{
-id:"city",
-name:"Klobop City",
-emoji:"🏙️",
-desc:"Большой город: дороги, здания, машины, светофоры и секретные места.",
-type:"city"
-},
-
-{
-id:"obby",
-name:"Mega Obby",
-emoji:"🏃",
-desc:"Безумный паркур с платформами, прыжками, чекпоинтами и финишем.",
-type:"obby"
-},
-
-{
-id:"island",
-name:"Klobop Island",
-emoji:"🏝️",
-desc:"Остров с пальмами, океаном, сундуками и сокровищами.",
-type:"island"
-},
-
-{
-id:"arena",
-name:"Battle Arena",
-emoji:"⚔️",
-desc:"Тренировочная арена. Побеждай роботов и получай награды.",
-type:"arena"
-},
-
-{
-id:"space",
-name:"Space Base",
-emoji:"🚀",
-desc:"Космическая база с порталами, астероидами и низкой гравитацией.",
-type:"space"
-},
-
-{
-id:"forest",
-name:"Mystic Forest",
-emoji:"🌲",
-desc:"Таинственный лес с кристаллами, мостами и секретным храмом.",
-type:"forest"
-},
-
-{
-id:"race",
-name:"Klobop Racing",
-emoji:"🏎️",
-desc:"Гонки по неоновому треку. Собирай ускорители.",
-type:"race"
-},
-
-{
-id:"build",
-name:"Build Zone",
-emoji:"🏗️",
-desc:"Свободная строительная зона. Ставь блоки и создавай свой мир.",
-type:"build"
-}
-
-];
-
-
-const items=[
-
-["default","🙂","Classic","Обычный Klobop"],
-["blue","🔵","Blue Hero","Синий герой"],
-["fire","🔥","Fire","Огненный стиль"],
-["robot","🤖","Robot","Робот"],
-["alien","👽","Alien","Инопланетный"],
-["ninja","🥷","Ninja","Ниндзя"],
-["crown","👑","Royal","Королевский"],
-["ghost","👻","Ghost","Призрачный"],
-["star","⭐","Star","Звёздный"],
-["rainbow","🌈","Rainbow","Радужный"]
-
-];
-
-
-/* =========================
-   CANVAS
-========================= */
-
-const menu=
-document.getElementById("menu");
-
-const top=
-document.getElementById("top");
-
-const canvas=
-document.getElementById("c");
-
-const ctx=
-canvas.getContext("2d");
-
-let W=innerWidth;
-let H=innerHeight;
-let DPR=1;
-
+let W=innerWidth,H=innerHeight,DPR=1;
 
 function resize(){
-
-W=innerWidth;
-H=innerHeight;
-
-DPR=Math.min(
-devicePixelRatio||1,
-2
-);
-
-canvas.width=W*DPR;
-canvas.height=H*DPR;
-
-canvas.style.width=W+"px";
-canvas.style.height=H+"px";
-
-ctx.setTransform(
-DPR,
-0,
-0,
-DPR,
-0,
-0
-);
-
+ W=innerWidth;H=innerHeight;
+ DPR=Math.min(devicePixelRatio||1,2);
+ canvas.width=W*DPR;
+ canvas.height=H*DPR;
+ ctx.setTransform(DPR,0,0,DPR,0,0);
 }
-
-addEventListener(
-"resize",
-resize
-);
-
+addEventListener("resize",resize);
 resize();
 
+const KEY="KLOBOP_SAVE_2";
 
-/* =========================
-   UI
-========================= */
-
-function refreshStats(){
-
-document.getElementById(
-"playerName"
-).textContent=save.name;
-
-document.getElementById(
-"menuCoins"
-).textContent=save.coins;
-
-document.getElementById(
-"menuXP"
-).textContent=save.xp;
-
-document.getElementById(
-"wins"
-).textContent=save.wins;
-
-document.getElementById(
-"coins"
-).textContent=save.coins;
-
-document.getElementById(
-"xp"
-).textContent=save.xp;
-
-}
-
-refreshStats();
-
-
-const placesEl=
-document.getElementById("places");
-
-
-places.forEach(
-p=>{
-
-const b=
-document.createElement("button");
-
-b.className="place";
-
-b.innerHTML=`
-
-<div class="go">
-PLAY
-</div>
-
-<h3>
-${p.name}
-</h3>
-
-<p>
-${p.desc}
-</p>
-
-<div class="emoji">
-${p.emoji}
-</div>
-`;
-
-b.onclick=()=>{
-startPlace(p.id);
+let save={
+ name:"Klobop",
+ coins:250,
+ xp:0,
+ wins:0,
+ skin:"default",
+ owned:["default"]
 };
 
-placesEl.appendChild(b);
+try{
+ const s=JSON.parse(localStorage.getItem(KEY));
+ if(s)save={...save,...s};
+}catch(e){}
 
+function saveGame(){
+ localStorage.setItem(KEY,JSON.stringify(save));
+ updateStats();
+}
+
+function updateStats(){
+ document.getElementById("name").textContent=save.name;
+ document.getElementById("coins").textContent=save.coins;
+ document.getElementById("xp").textContent=save.xp;
+ document.getElementById("wins").textContent=save.wins;
+ document.getElementById("gameCoins").textContent=save.coins;
+ document.getElementById("gameXP").textContent=save.xp;
+}
+
+const places=[
+["city","🏙️","Klobop City","Неоновый город с улицами, зданиями и секретами.","#4d7cff"],
+["obby","🏃","Mega Obby","Безумный паркур. Прыгай по платформам и доберись до финиша.","#b35cff"],
+["island","🏝️","Klobop Island","Огромный остров, океан, пальмы и спрятанные монеты.","#27d9ff"],
+["arena","⚔️","Battle Arena","Арена с врагами. Побеждай их и получай награды.","#ff4d78"],
+["space","🚀","Space Base","Космическая станция, планеты и платформы в невесомости.","#785cff"],
+["forest","🌲","Mystic Forest","Магический лес с деревьями, кристаллами и тайниками.","#38d979"],
+["race","🏎️","Klobop Racing","Неоновая трасса и ускорители. Гони как можно быстрее.","#ff48d0"],
+["build","🏗️","Build Zone","Строй собственные платформы прямо во время игры.","#ffb83d"]
+];
+
+const skins=[
+["default","🙂","Classic"],
+["blue","🔵","Blue"],
+["fire","🔥","Fire"],
+["robot","🤖","Robot"],
+["alien","👽","Alien"],
+["ninja","🥷","Ninja"],
+["crown","👑","Royal"],
+["ghost","👻","Ghost"],
+["star","⭐","Star"],
+["rainbow","🌈","Rainbow"]
+];
+
+const placesEl=document.getElementById("places");
+
+places.forEach(p=>{
+ const b=document.createElement("button");
+ b.className="place";
+ b.style.setProperty("--c",p[4]);
+ b.innerHTML=`
+ <div class="placeIcon">${p[1]}</div>
+ <h3>${p[2]}</h3>
+ <p>${p[3]}</p>
+ <span class="playTag">PLAY →</span>`;
+ b.addEventListener("click",()=>start(p[0]));
+ placesEl.appendChild(b);
 });
 
+const menu=document.getElementById("menu");
+const gameUI=document.getElementById("gameUI");
+const modal=document.getElementById("modal");
 
-/* =========================
-   MODAL
-========================= */
-
-const modal=
-document.getElementById("modal");
-
-const modalTitle=
-document.getElementById("modalTitle");
-
-const modalContent=
-document.getElementById("modalContent");
-
-
-function openModal(
-title,
-html
-){
-
-modalTitle.textContent=
-title;
-
-modalContent.innerHTML=
-html;
-
-modal.style.display=
-"flex";
-
+function showModal(title,html){
+ document.getElementById("modalTitle").textContent=title;
+ document.getElementById("modalContent").innerHTML=html;
+ modal.style.display="flex";
 }
 
+document.getElementById("close").onclick=()=>modal.style.display="none";
 
-document.getElementById(
-"close"
-).onclick=()=>{
-modal.style.display="none";
+document.getElementById("shopBtn").onclick=()=>{
+ let html=`<p style="color:#8e96b5">Все предметы доступны бесплатно.</p><div class="items">`;
+ skins.forEach(s=>{
+  const owned=save.owned.includes(s[0]);
+  html+=`
+  <div class="item">
+   <div class="itemIcon">${s[1]}</div>
+   <b>${s[2]}</b>
+   <button data-skin="${s[0]}">${owned?"НАДЕТЬ":"ПОЛУЧИТЬ"}</button>
+  </div>`;
+ });
+ html+="</div>";
+ showModal("🛍️ Бесплатный магазин",html);
+
+ document.querySelectorAll("[data-skin]").forEach(btn=>{
+  btn.onclick=()=>{
+   const id=btn.dataset.skin;
+   if(!save.owned.includes(id))save.owned.push(id);
+   save.skin=id;
+   saveGame();
+   document.getElementById("modal").style.display="none";
+  };
+ });
 };
 
+document.getElementById("invBtn").onclick=()=>{
+ let html=`<p style="color:#8e96b5">Выбери своего персонажа.</p><div class="items">`;
+ skins.filter(s=>save.owned.includes(s[0])).forEach(s=>{
+  html+=`
+  <div class="item">
+   <div class="itemIcon">${s[1]}</div>
+   <b>${s[2]}</b>
+   <button data-equip="${s[0]}">${save.skin===s[0]?"НАДЕТО":"НАДЕТЬ"}</button>
+  </div>`;
+ });
+ html+="</div>";
+ showModal("🎒 Инвентарь",html);
 
-/* =========================
-   SHOP
-========================= */
-
-function shop(){
-
-let html=`
-
-<p style="
-opacity:.7;
-margin-top:8px
-">
-Все предметы бесплатные.
-Нажми «Получить».
-</p>
-
-<div class="itemGrid">
-`;
-
-for(
-const it of items
-){
-
-const owned=
-save.items.includes(
-it[0]
-);
-
-html+=`
-
-<div class="item">
-
-<div class="icon">
-${it[1]}
-</div>
-
-<b>
-${it[2]}
-</b>
-
-<p style="
-font-size:10px;
-opacity:.6;
-margin-top:5px
-">
-${it[3]}
-</p>
-
-<button data-item="${it[0]}">
-${
-owned
-?
-"НАДЕТО / ЕСТЬ"
-:
-"ПОЛУЧИТЬ БЕСПЛАТНО"
-}
-</button>
-
-</div>
-
-`;
-
-}
-
-html+="</div>";
-
-openModal(
-"🛍️ Бесплатный магазин",
-html
-);
-
-document
-.querySelectorAll(
-"[data-item]"
-)
-.forEach(
-b=>{
-
-b.onclick=()=>{
-
-const id=
-b.dataset.item;
-
-if(
-!save.items.includes(id)
-){
-save.items.push(id);
-}
-
-save.equipped=id;
-
-persist();
-refreshStats();
-shop();
-
+ document.querySelectorAll("[data-equip]").forEach(btn=>{
+  btn.onclick=()=>{
+   save.skin=btn.dataset.equip;
+   saveGame();
+   modal.style.display="none";
+  };
+ });
 };
 
-}
-);
-
-}
-
-document.getElementById(
-"shop"
-).onclick=shop;
-
-
-/* =========================
-   INVENTORY
-========================= */
-
-function inventory(){
-
-let html=`
-
-<p style="
-opacity:.7;
-margin-top:8px
-">
-Выбери внешний вид.
-</p>
-
-<div class="itemGrid">
-`;
-
-for(
-const it of items
-){
-
-if(
-!save.items.includes(
-it[0]
-)
-)continue;
-
-html+=`
-
-<div class="item">
-
-<div class="icon">
-${it[1]}
-</div>
-
-<b>
-${it[2]}
-</b>
-
-<button
-data-equip="${it[0]}"
->
-${
-save.equipped===it[0]
-?
-"НАДЕТО"
-:
-"НАДЕТЬ"
-}
-</button>
-
-</div>
-`;
-
-}
-
-html+="</div>";
-
-openModal(
-"🎒 Инвентарь",
-html
-);
-
-document
-.querySelectorAll(
-"[data-equip]"
-)
-.forEach(
-b=>{
-
-b.onclick=()=>{
-
-save.equipped=
-b.dataset.equip;
-
-persist();
-
-inventory();
-
+document.getElementById("nameBtn").onclick=()=>{
+ const n=prompt("Имя игрока:",save.name);
+ if(n&&n.trim()){
+  save.name=n.trim().slice(0,18);
+  saveGame();
+ }
 };
 
-}
-);
-
-}
-
-document.getElementById(
-"inventory"
-).onclick=inventory;
-
-
-/* =========================
-   NAME
-========================= */
-
-document.getElementById(
-"nameBtn"
-).onclick=()=>{
-
-const n=
-prompt(
-"Введите имя игрока:",
-save.name
-);
-
-if(
-n&&n.trim()
-){
-
-save.name=
-n.trim().slice(0,18);
-
-persist();
-refreshStats();
-
-}
-
+document.getElementById("randomBtn").onclick=()=>{
+ start(places[Math.floor(Math.random()*places.length)][0]);
 };
 
-
-/* =========================
-   RESET
-========================= */
-
-document.getElementById(
-"reset"
-).onclick=()=>{
-
-if(
-confirm(
-"Удалить весь прогресс Klobop?"
-)
-){
-
-save={
-name:"Klobop",
-coins:250,
-xp:0,
-wins:0,
-items:["default"],
-equipped:"default"
-};
-
-persist();
-refreshStats();
-
-}
-
-};
-
-
-/* =========================
-   ENGINE
-========================= */
-
-let running=false;
-
+let game=false;
 let world=null;
-
+let currentType="";
+let last=0;
+let cam=0;
+let time=0;
 let particles=[];
-
-let cameraX=0;
-
-let cameraY=0;
-
-let gameTime=0;
-
-let score=0;
-
-let currentPlace=null;
-
-let message="";
-
-let messageTime=0;
-
-
-const player={
-
-x:300,
-y:300,
-
-w:32,
-h:48,
-
-vx:0,
-vy:0,
-
-onGround:false,
-
-speed:5.5,
-
-jump:-13,
-
-dir:1,
-
-health:100
-
-};
-
-
 let keys={};
 
-
-/* =========================
-   KEYBOARD
-========================= */
-
-addEventListener(
-"keydown",
-e=>{
-
-keys[e.code]=true;
-
-if(
-[
-"Space",
-"ArrowUp",
-"ArrowDown",
-"ArrowLeft",
-"ArrowRight"
-].includes(e.code)
-){
-e.preventDefault();
-}
-
-if(
-e.code==="Escape"&&running
-){
-leaveWorld();
-}
-
-}
-);
-
-
-addEventListener(
-"keyup",
-e=>{
-keys[e.code]=false;
-}
-);
-
-
-/* =========================
-   MOBILE
-========================= */
-
-function bindHold(
-id,
-code
-){
-
-const b=
-document.getElementById(id);
-
-const on=e=>{
-e.preventDefault();
-keys[code]=true;
+const player={
+ x:300,y:200,w:34,h:48,vx:0,vy:0,
+ speed:6,jump:-13,onGround:false,dir:1
 };
 
-const off=e=>{
-e.preventDefault();
-keys[code]=false;
-};
+function inputKey(e){
+ keys[e.code]=true;
+ if(["ArrowLeft","ArrowRight","ArrowUp","Space"].includes(e.code))e.preventDefault();
+}
+function inputUp(e){keys[e.code]=false}
+addEventListener("keydown",inputKey);
+addEventListener("keyup",inputUp);
 
-b.addEventListener(
-"pointerdown",
-on
-);
+function hold(id,code){
+ const el=document.getElementById(id);
+ el.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  keys[code]=true;
+  el.setPointerCapture?.(e.pointerId);
+ });
+ ["pointerup","pointercancel","pointerleave"].forEach(ev=>{
+  el.addEventListener(ev,e=>{
+   e.preventDefault();
+   keys[code]=false;
+  });
+ });
+}
+hold("left","ArrowLeft");
+hold("right","ArrowRight");
 
-b.addEventListener(
-"pointerup",
-off
-);
+document.getElementById("jump").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ if(player.onGround)player.vy=-13;
+});
 
-b.addEventListener(
-"pointercancel",
-off
-);
+document.getElementById("act").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ action();
+});
 
-b.addEventListener(
-"pointerleave",
-off
-);
+document.getElementById("back").onclick=leave;
 
+function start(type){
+ currentType=type;
+ world=createWorld(type);
+ player.x=260;
+ player.y=300;
+ player.vx=0;
+ player.vy=0;
+ player.onGround=false;
+ cam=0;
+ time=0;
+ particles=[];
+ game=true;
+ menu.style.display="none";
+ gameUI.style.display="block";
+ document.getElementById("gameTitle").textContent=
+ places.find(x=>x[0]===type)[1]+" "+places.find(x=>x[0]===type)[2];
+ updateStats();
+ last=performance.now();
+ requestAnimationFrame(loop);
 }
 
-bindHold(
-"left",
-"ArrowLeft"
-);
-
-bindHold(
-"right",
-"ArrowRight"
-);
-
-
-document.getElementById(
-"jump"
-).addEventListener(
-"pointerdown",
-e=>{
-
-e.preventDefault();
-
-if(
-player.onGround
-){
-player.vy=
-player.jump;
+function leave(){
+ game=false;
+ gameUI.style.display="none";
+ menu.style.display="block";
 }
 
+function block(x,y,w,h,type="platform"){
+ return{x,y,w,h,type};
 }
-);
-
-
-document.getElementById(
-"action"
-).addEventListener(
-"pointerdown",
-e=>{
-
-e.preventDefault();
-
-action();
-
-}
-);
-
-
-document.getElementById(
-"homeBtn"
-).onclick=
-leaveWorld;
-
-
-/* =========================
-   WORLD
-========================= */
-
-function startPlace(id){
-
-const p=
-places.find(
-x=>x.id===id
-);
-
-if(!p)return;
-
-currentPlace=p;
-
-menu.style.display=
-"none";
-
-top.style.display=
-"flex";
-
-document.getElementById(
-"placeName"
-).textContent=
-p.emoji+" "+p.name;
-
-running=true;
-
-gameTime=0;
-
-cameraX=0;
-cameraY=0;
-
-score=0;
-
-player.x=300;
-player.y=250;
-
-player.vx=0;
-player.vy=0;
-
-player.health=100;
-
-particles=[];
-
-world=
-createWorld(
-p.type
-);
-
-requestAnimationFrame(
-loop
-);
-
-}
-
-
-/* =========================
-   WORLD GENERATOR
-========================= */
 
 function createWorld(type){
+ const o={
+  width:6000,
+  gravity:.72,
+  solids:[],
+  coins:[],
+  enemies:[],
+  decor:[],
+  goal:null
+ };
+ const gy=H*.76;
 
-const o={
+ o.solids.push(block(0,gy,6000,500,"ground"));
 
-type,
-
-solids:[],
-coins:[],
-enemies:[],
-decor:[],
-portals:[],
-checkpoints:[],
-
-goal:null,
-
-gravity:.75,
-
-width:5000,
-
-height:1800
-
-};
-
-
-const groundY=
-H*.75;
-
-
-if(type==="city"){
-
-o.width=6500;
-
-addGround(
-o,
-0,
-groundY,
-6500,
-500
-);
-
-for(
-let x=300;
-x<6300;
-x+=300
-){
-
-const h=
-100+
-Math.random()*280;
-
-addBlock(
-o,
-x,
-groundY-h,
-210,
-h,
-"building"
-);
-
-o.decor.push({
-type:"light",
-x:x+30,
-y:groundY-h+35
-});
-
-o.decor.push({
-type:"light",
-x:x+100,
-y:groundY-h+70
-});
-
+ if(type==="city"){
+  o.width=7000;
+  for(let x=200;x<6800;x+=280){
+   const h=100+Math.random()*260;
+   o.solids.push(block(x,gy-h,190,h,"building"));
+   if(Math.random()<.8)o.decor.push({t:"window",x:x+35,y:gy-h+40});
+   if(Math.random()<.8)o.decor.push({t:"window",x:x+100,y:gy-h+80});
+  }
+  for(let i=0;i<25;i++)o.coins.push({x:300+i*260,y:gy-80-Math.random()*130});
+ }
+ if(type==="obby"){
+  o.width=6500;
+  o.solids=[];
+  o.solids.push(block(0,gy,500,500,"ground"));
+  let x=500;
+  for(let i=0;i<45;i++){
+   x+=110+Math.random()*75;
+   let y=gy-80-Math.random()*260;
+   o.solids.push(block(x,y,100,28,"platform"));
+   if(i%2===0)o.coins.push({x:x+45,y:y-45});
+  }
+ }
+ if(type==="island"){
+  o.width=6500;
+  o.solids=[];
+  o.solids.push(block(0,gy,1000,500,"ground"));
+  o.solids.push(block(1250,gy+70,900,500,"ground"));
+  o.solids.push(block(2450,gy-10,1000,500,"ground"));
+  o.solids.push(block(3800,gy+40,2700,500,"ground"));
+  for(let i=0;i<35;i++)o.decor.push({t:"palm",x:100+i*180,y:gy-120});
+  for(let i=0;i<30;i++)o.coins.push({x:180+i*210,y:gy-80-Math.random()*140});
+ }
+ if(type==="arena"){
+  o.width=4000;
+  for(let i=0;i<11;i++)o.enemies.push({x:450+i*300,y:gy-45,w:36,h:45,vx:1,hp:3,alive:true});
+  for(let i=0;i<25;i++)o.coins.push({x:250+i*145,y:gy-80-Math.random()*170});
+ }
+ if(type==="space"){
+  o.width=7000;
+  o.gravity=.35;
+  o.solids=[];
+  o.solids.push(block(0,gy,700,500,"ground"));
+  for(let i=0;i<45;i++){
+   let x=850+i*140;
+   let y=150+Math.random()*(gy-230);
+   o.solids.push(block(x,y,100,25,"platform"));
+   if(i%2===0)o.coins.push({x:x+45,y:y-45});
+  }
+  for(let i=0;i<15;i++)o.decor.push({t:"planet",x:Math.random()*7000,y:80+Math.random()*350});
+ }
+ if(type==="forest"){
+  o.width=6500;
+  for(let i=0;i<40;i++)o.decor.push({t:"tree",x:100+i*160,y:gy-170});
+  for(let i=0;i<30;i++)o.coins.push({x:180+i*210,y:gy-80-Math.random()*150});
+ }
+ if(type==="race"){
+  o.width=8500;
+  for(let i=0;i<65;i++)o.coins.push({x:150+i*125,y:gy-55});
+  for(let i=0;i<18;i++)o.solids.push(block(700+i*420,gy-70-Math.random()*100,100,40,"ramp"));
+ }
+ if(type==="build"){
+  o.width=6500;
+  for(let i=0;i<25;i++){
+   o.solids.push(block(500+i*230,gy-60-(i%5)*50,90,50,"build"));
+  }
+ }
+ o.goal={x:o.width-180,y:gy-150,w:60,h:150};
+ return o;
 }
 
-for(
-let x=600;
-x<6200;
-x+=500
-){
-
-o.decor.push({
-type:"car",
-x,
-y:groundY-38
-});
-
+function hit(a,b){
+ return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 }
-
-for(
-let x=900;
-x<6200;
-x+=800
-){
-
-o.coins.push({
-x,
-y:groundY-90
-});
-
-}
-
-o.goal={
-x:6250,
-y:groundY-120,
-w:60,
-h:120
-};
-
-}
-
-
-else if(type==="obby"){
-
-o.width=5200;
-
-addGround(
-o,
-0,
-groundY,
-450,
-500
-);
-
-let x=500;
-
-let y=
-groundY-80;
-
-for(
-let i=0;
-i<42;
-i++
-){
-
-x+=
-100+
-Math.random()*90;
-
-y=
-groundY-
-60-
-Math.random()*230;
-
-addBlock(
-o,
-x,
-y,
-100,
-35,
-"platform"
-);
-
-if(
-i%3===0
-){
-
-o.coins.push({
-x:x+45,
-y:y-45
-});
-
-}
-
-if(
-i%4===0
-){
-
-o.decor.push({
-type:"spike",
-x:x+35,
-y:y-28
-});
-
-}
-
-}
-
-o.goal={
-x:5000,
-y:groundY-300,
-w:60,
-h:300
-};
-
-}
-
-
-else if(type==="island"){
-
-o.width=6000;
-
-addGround(
-o,
-0,
-groundY,
-900,
-500
-);
-
-addGround(
-o,
-1200,
-groundY+80,
-1000,
-500
-);
-
-addGround(
-o,
-2600,
-groundY-20,
-900,
-500
-);
-
-addGround(
-o,
-3900,
-groundY+50,
-2000,
-500
-);
-
-for(
-let i=0;
-i<35;
-i++
-){
-
-o.decor.push({
-type:"palm",
-x:200+i*160+
-Math.random()*80,
-y:groundY-120
-});
-
-}
-
-for(
-let i=0;
-i<30;
-i++
-){
-
-o.coins.push({
-x:180+i*190,
-y:
-groundY-
-80-
-Math.random()*120
-});
-
-}
-
-o.goal={
-x:5750,
-y:groundY-130,
-w:60,
-h:130
-};
-
-}
-
-
-else if(type==="arena"){
-
-o.width=3500;
-
-addGround(
-o,
-0,
-groundY,
-3500,
-500
-);
-
-for(
-let i=0;
-i<10;
-i++
-){
-
-o.enemies.push({
-
-x:400+i*280,
-
-y:groundY-45,
-
-w:34,
-h:45,
-
-vx:
-1+
-Math.random(),
-
-hp:3,
-
-alive:true
-
-});
-
-}
-
-for(
-let i=0;
-i<18;
-i++
-){
-
-o.coins.push({
-x:250+i*180,
-y:
-groundY-
-80-
-Math.random()*160
-});
-
-}
-
-o.goal={
-x:3300,
-y:groundY-130,
-w:60,
-h:130
-};
-
-}
-
-
-else if(type==="space"){
-
-o.width=6500;
-
-o.gravity=.34;
-
-addGround(
-o,
-0,
-groundY,
-800,
-500
-);
-
-for(
-let i=0;
-i<38;
-i++
-){
-
-const x=
-900+
-i*145+
-Math.random()*80;
-
-const y=
-180+
-Math.random()*
-(groundY-230);
-
-addBlock(
-o,
-x,
-y,
-95,
-25,
-"platform"
-);
-
-if(
-i%2===0
-){
-
-o.coins.push({
-x:x+45,
-y:y-45
-});
-
-}
-
-}
-
-for(
-let i=0;
-i<25;
-i++
-){
-
-o.decor.push({
-type:"planet",
-x:Math.random()*6500,
-y:80+Math.random()*300
-});
-
-}
-
-o.goal={
-x:6300,
-y:150,
-w:70,
-h:500
-};
-
-}
-
-
-else if(type==="forest"){
-
-o.width=6000;
-
-addGround(
-o,
-0,
-groundY,
-6000,
-500
-);
-
-for(
-let i=0;
-i<38;
-i++
-){
-
-o.decor.push({
-type:"tree",
-x:
-100+
-i*155+
-Math.random()*60,
-y:groundY-180
-});
-
-}
-
-for(
-let i=0;
-i<28;
-i++
-){
-
-o.coins.push({
-x:220+i*205,
-y:
-groundY-
-100-
-Math.random()*150
-});
-
-}
-
-for(
-let i=0;
-i<12;
-i++
-){
-
-addBlock(
-o,
-600+i*430,
-groundY-
-80-
-Math.random()*130,
-120,
-30,
-"platform"
-);
-
-}
-
-o.goal={
-x:5700,
-y:groundY-160,
-w:60,
-h:160
-};
-
-}
-
-
-else if(type==="race"){
-
-o.width=8000;
-
-addGround(
-o,
-0,
-groundY,
-8000,
-500
-);
-
-for(
-let i=0;
-i<60;
-i++
-){
-
-o.coins.push({
-x:150+i*125,
-y:groundY-55
-});
-
-}
-
-for(
-let i=0;
-i<24;
-i++
-){
-
-o.decor.push({
-type:"boost",
-x:300+i*310,
-y:groundY-18
-});
-
-}
-
-for(
-let i=0;
-i<15;
-i++
-){
-
-addBlock(
-o,
-700+i*470,
-groundY-
-40-
-Math.random()*120,
-90,
-40,
-"ramp"
-);
-
-}
-
-o.goal={
-x:7800,
-y:groundY-140,
-w:60,
-h:140
-};
-
-}
-
-
-else if(type==="build"){
-
-o.width=6000;
-
-addGround(
-o,
-0,
-groundY,
-6000,
-500
-);
-
-for(
-let i=0;
-i<20;
-i++
-){
-
-addBlock(
-o,
-500+i*260,
-groundY-70-(i%4)*60,
-100,
-60,
-"build"
-);
-
-}
-
-for(
-let i=0;
-i<20;
-i++
-){
-
-o.coins.push({
-x:450+i*270,
-y:groundY-150
-});
-
-}
-
-o.goal={
-x:5750,
-y:groundY-120,
-w:60,
-h:120
-};
-
-}
-
-return o;
-
-}
-
-
-function addGround(
-o,
-x,
-y,
-w,
-h
-){
-
-o.solids.push({
-x,y,w,h,
-type:"ground"
-});
-
-}
-
-
-function addBlock(
-o,
-x,
-y,
-w,
-h,
-type
-){
-
-o.solids.push({
-x,y,w,h,type
-});
-
-}
-
-
-/* =========================
-   COLLISION
-========================= */
-
-function rectHit(a,b){
-
-return (
-
-a.x<
-b.x+b.w&&
-
-a.x+a.w>
-b.x&&
-
-a.y<
-b.y+b.h&&
-
-a.y+a.h>
-b.y
-
-);
-
-}
-
-
-/* =========================
-   UPDATE
-========================= */
 
 function update(dt){
+ const d=Math.min(2,dt/16.67);
+ time+=dt;
 
-const d=
-Math.min(
-2,
-dt/16.666
-);
+ const left=keys.ArrowLeft||keys.KeyA;
+ const right=keys.ArrowRight||keys.KeyD;
 
-gameTime+=dt;
+ if(left){player.vx-=.8*d;player.dir=-1}
+ if(right){player.vx+=.8*d;player.dir=1}
+ player.vx*=Math.pow(.78,d);
+ player.vx=Math.max(-player.speed,Math.min(player.speed,player.vx));
 
+ if((keys.Space||keys.ArrowUp||keys.KeyW)&&player.onGround){
+  player.vy=-13;
+  player.onGround=false;
+  keys.Space=keys.ArrowUp=keys.KeyW=false;
+ }
 
-let left=
-keys.ArrowLeft||
-keys.KeyA;
+ player.vy+=world.gravity*d;
+ player.x+=player.vx*d;
+ player.y+=player.vy*d;
+ player.onGround=false;
 
-let right=
-keys.ArrowRight||
-keys.KeyD;
+ for(const s of world.solids){
+  if(hit(player,s)){
+   const oldBottom=player.y-player.vy*d+player.h;
+   if(oldBottom<=s.y+12&&player.vy>=0){
+    player.y=s.y-player.h;
+    player.vy=0;
+    player.onGround=true;
+   }else if(player.x+player.w/2<s.x+s.w/2){
+    player.x=s.x-player.w;
+    player.vx=0;
+   }else{
+    player.x=s.x+s.w;
+    player.vx=0;
+   }
+  }
+ }
 
+ for(const c of world.coins){
+  if(c.got)continue;
+  if(Math.hypot(player.x+17-c.x,player.y+24-c.y)<34){
+   c.got=true;
+   save.coins+=10;
+   save.xp+=5;
+   saveGame();
+   burst(c.x,c.y,"#ffe34c",12);
+  }
+ }
 
-player.vx*=
-Math.pow(
-.78,
-d
-);
+ for(const e of world.enemies){
+  if(!e.alive)continue;
+  e.x+=e.vx*d;
+  if(Math.abs(e.x-player.x)<500)e.vx=player.x<e.x?-1:1;
+  if(hit(player,e)){
+   if(player.vy>3){
+    e.hp--;
+    player.vy=-9;
+    if(e.hp<=0){
+     e.alive=false;
+     save.coins+=25;
+     save.xp+=20;
+     saveGame();
+    }
+    burst(e.x,e.y,"#ff5477",15);
+   }
+  }
+ }
 
+ if(player.y>H+500){
+  player.x=Math.max(100,player.x-400);
+  player.y=100;
+  player.vy=0;
+ }
 
-if(left){
+ if(hit(player,world.goal)){
+  finish();
+ }
 
-player.vx-=
-player.speed*.22*d;
+ cam+=(player.x-W*.35-cam)*.1;
+ cam=Math.max(0,Math.min(world.width-W,cam));
 
-player.dir=-1;
-
+ for(let i=particles.length-1;i>=0;i--){
+  const p=particles[i];
+  p.x+=p.vx*d;
+  p.y+=p.vy*d;
+  p.vy+=.15*d;
+  p.life-=.025*d;
+  if(p.life<=0)particles.splice(i,1);
+ }
 }
-
-
-if(right){
-
-player.vx+=
-player.speed*.22*d;
-
-player.dir=1;
-
-}
-
-
-player.vx=
-Math.max(
--player.speed,
-Math.min(
-player.speed,
-player.vx
-)
-);
-
-
-if(
-(
-keys.Space||
-keys.ArrowUp||
-keys.KeyW
-)&&
-player.onGround
-){
-
-player.vy=
-player.jump;
-
-player.onGround=
-false;
-
-keys.Space=
-keys.ArrowUp=
-keys.KeyW=
-false;
-
-}
-
-
-player.vy+=
-world.gravity*d;
-
-player.x+=
-player.vx*d;
-
-player.y+=
-player.vy*d;
-
-player.onGround=
-false;
-
-
-for(
-const s of world.solids
-){
-
-if(
-rectHit(
-player,
-s
-)
-){
-
-const oldBottom=
-player.y-
-player.vy*d+
-player.h;
-
-
-if(
-oldBottom<=
-s.y+14&&
-player.vy>=0
-){
-
-player.y=
-s.y-player.h;
-
-player.vy=0;
-
-player.onGround=
-true;
-
-}
-
-else if(
-player.x+
-player.w/2<
-s.x+s.w/2
-){
-
-player.x=
-s.x-player.w;
-
-player.vx=0;
-
-}
-
-else{
-
-player.x=
-s.x+s.w;
-
-player.vx=0;
-
-}
-
-}
-
-}
-
-
-if(
-player.x<0
-){
-player.x=0;
-}
-
-
-/* COINS */
-
-for(
-const c of world.coins
-){
-
-if(c.got)continue;
-
-if(
-Math.hypot(
-player.x+16-c.x,
-player.y+24-c.y
-)<35
-){
-
-c.got=true;
-
-save.coins+=10;
-
-save.xp+=5;
-
-refreshStats();
-
-persist();
-
-burst(
-c.x,
-c.y,
-"#ffe34c",
-14
-);
-
-}
-
-}
-
-
-/* ENEMIES */
-
-for(
-const e of world.enemies
-){
-
-if(!e.alive)continue;
-
-e.x+=
-e.vx*d;
-
-if(
-Math.abs(
-e.x-player.x
-)<650
-){
-
-e.vx+=
-player.x<e.x?
--.02:
-.02;
-
-e.vx=
-Math.max(
--2,
-Math.min(
-2,
-e.vx
-)
-);
-
-}
-
-if(
-rectHit(
-player,
-e
-)
-){
-
-if(
-player.vy>3&&
-player.y+
-player.h-
-e.y<25
-){
-
-e.hp--;
-
-player.vy=-9;
-
-burst(
-e.x,
-e.y,
-"#ff5d75",
-15
-);
-
-if(
-e.hp<=0
-){
-
-e.alive=false;
-
-save.coins+=25;
-save.xp+=20;
-
-refreshStats();
-persist();
-
-}
-
-}
-
-else{
-
-player.health-=
-1.5*d;
-
-if(
-player.health<=0
-){
-
-respawn();
-
-}
-
-}
-
-}
-
-}
-
-
-/* BOOST */
-
-for(
-const dObj of world.decor
-){
-
-if(
-dObj.type==="boost"&&
-Math.abs(
-player.x-dObj.x
-)<35&&
-player.y>
-groundY()-70
-){
-
-player.vx=10;
-
-burst(
-player.x,
-player.y+
-player.h,
-"#48eaff",
-2
-);
-
-}
-
-}
-
-
-/* GOAL */
-
-if(
-world.goal&&
-rectHit(
-player,
-world.goal
-)
-){
-
-completePlace();
-
-}
-
-
-/* FALL */
-
-if(
-player.y>
-H+500
-){
-
-respawn();
-
-}
-
-
-/* CAMERA */
-
-cameraX+=
-(
-player.x-
-W*.35-
-cameraX
-)*.1;
-
-cameraX=
-Math.max(
-0,
-Math.min(
-world.width-W,
-cameraX
-)
-);
-
-cameraY+=
-(
-player.y-
-H*.55-
-cameraY
-)*.08;
-
-
-if(
-world.type==="space"
-){
-
-cameraY=
-Math.max(
--250,
-Math.min(
-250,
-cameraY
-);
-
-}else{
-
-cameraY=0;
-
-}
-
-
-/* PARTICLES */
-
-for(
-let i=particles.length-1;
-i>=0;
-i--
-){
-
-const p=
-particles[i];
-
-p.x+=
-p.vx*d;
-
-p.y+=
-p.vy*d;
-
-p.vy+=
-.15*d;
-
-p.life-=
-.025*d;
-
-if(
-p.life<=0
-){
-
-particles.splice(
-i,
-1
-);
-
-}
-
-}
-
-
-score+=
-Math.max(
-0,
-Math.abs(
-player.vx
-)
-)*d;
-
-}
-
-
-/* =========================
-   RESPAWN
-========================= */
-
-function respawn(){
-
-player.x=
-Math.max(
-100,
-player.x-350
-);
-
-player.y=150;
-
-player.vy=0;
-
-player.health=100;
-
-message=
-"↻ Возрождение";
-
-messageTime=100;
-
-}
-
-
-/* =========================
-   ACTION
-========================= */
 
 function action(){
-
-if(!running)return;
-
-
-if(
-world.type==="build"
-){
-
-const bx=
-Math.round(
-(
-player.x+
-player.dir*100
-)/50
-)*50;
-
-const by=
-Math.round(
-(
-player.y+
-player.h-20
-)/50
-)*50;
-
-addBlock(
-world,
-bx,
-by-50,
-50,
-50,
-"build"
-);
-
-burst(
-bx+25,
-by-25,
-"#b06cff",
-8
-);
-
+ if(currentType==="build"){
+  const x=Math.round((player.x+player.dir*80)/50)*50;
+  const y=Math.round((player.y+player.h)/50)*50;
+  world.solids.push(block(x,y-50,50,50,"build"));
+  burst(x,y-25,"#b45cff",10);
+ }else{
+  save.coins++;
+  save.xp++;
+  saveGame();
+  burst(player.x+player.dir*40,player.y+20,"#45eaff",6);
+ }
 }
 
-else if(
-world.type==="arena"
-){
-
-for(
-const e of world.enemies
-){
-
-if(
-e.alive&&
-Math.abs(
-e.x-player.x
-)<100
-){
-
-e.hp--;
-
-burst(
-e.x,
-e.y,
-"#ffb13b",
-12
-);
-
-if(
-e.hp<=0
-){
-
-e.alive=false;
-
-save.coins+=25;
-save.xp+=20;
-
-refreshStats();
-persist();
-
+function finish(){
+ game=false;
+ save.wins++;
+ save.coins+=100;
+ save.xp+=100;
+ saveGame();
+ toast("🏆 Плейс пройден! +100 💰 +100 XP");
+ setTimeout(leave,1300);
 }
 
+function burst(x,y,color,n){
+ for(let i=0;i<n;i++){
+  particles.push({
+   x,y,
+   vx:(Math.random()-.5)*8,
+   vy:(Math.random()-.5)*8,
+   life:1,color
+  });
+ }
 }
-
-}
-
-}
-
-else{
-
-save.coins+=1;
-save.xp+=1;
-
-refreshStats();
-persist();
-
-burst(
-player.x+
-player.dir*45,
-player.y+20,
-"#43eaff",
-5
-);
-
-}
-
-}
-
-
-/* =========================
-   COMPLETE
-========================= */
-
-function completePlace(){
-
-running=false;
-
-save.wins++;
-
-save.coins+=100;
-
-save.xp+=100;
-
-persist();
-
-refreshStats();
-
-message=
-"🏆 PLACE COMPLETE!";
-
-messageTime=200;
-
-burst(
-player.x,
-player.y,
-"#ffe34c",
-60
-);
-
-setTimeout(
-()=>{
-
-if(
-confirm(
-"🏆 Ты прошёл "+
-currentPlace.name+
-"!\n\n+100 💰 и +100 XP\n\nВернуться в список плейсов?"
-)
-){
-
-leaveWorld();
-
-}
-
-else{
-
-running=true;
-
-requestAnimationFrame(
-loop
-);
-
-}
-
-},
-250
-);
-
-}
-
-
-/* =========================
-   PARTICLES
-========================= */
-
-function burst(
-x,
-y,
-color,
-n
-){
-
-for(
-let i=0;
-i<n;
-i++
-){
-
-particles.push({
-
-x,
-y,
-
-vx:
-(Math.random()-.5)*8,
-
-vy:
-(Math.random()-.5)*8,
-
-life:1,
-
-color
-
-});
-
-}
-
-}
-
-
-/* =========================
-   BACKGROUND
-========================= */
 
 function drawBackground(){
+ let g=ctx.createLinearGradient(0,0,0,H);
 
-const t=
-world.type;
+ const colors={
+  city:["#18244b","#060914"],
+  obby:["#28134d","#070912"],
+  island:["#31c4e5","#07506b"],
+  arena:["#3b1529","#090611"],
+  space:["#04051a","#13072f"],
+  forest:["#16443b","#061511"],
+  race:["#3b123e","#090611"],
+  build:["#27374d","#080c14"]
+ };
 
-let topColor=
-"#101b50";
+ const c=colors[currentType]||["#17203f","#060914"];
+ g.addColorStop(0,c[0]);
+ g.addColorStop(1,c[1]);
+ ctx.fillStyle=g;
+ ctx.fillRect(0,0,W,H);
 
-let bottom=
-"#050813";
+ for(let i=0;i<90;i++){
+  const x=(i*173-cam*.08)%W;
+  const y=(i*83)%(H*.7);
+  ctx.globalAlpha=.15+Math.sin(time/700+i)*.1;
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x<0?x+W:x,y,2,2);
+ }
+ ctx.globalAlpha=1;
 
-
-if(
-t==="island"
-){
-
-topColor="#39bde8";
-bottom="#0b4560";
-
+ if(currentType==="island"){
+  ctx.fillStyle="#48dfff";
+  ctx.fillRect(0,H*.78,W,H*.22);
+ }
 }
-
-if(
-t==="space"
-){
-
-topColor="#020318";
-bottom="#09002b";
-
-}
-
-if(
-t==="forest"
-){
-
-topColor="#173d3b";
-bottom="#061414";
-
-}
-
-if(
-t==="city"
-){
-
-topColor="#26345f";
-bottom="#090c18";
-
-}
-
-if(
-t==="race"
-){
-
-topColor="#31134d";
-bottom="#090713";
-
-}
-
-if(
-t==="arena"
-){
-
-topColor="#32151f";
-bottom="#0e0710";
-
-}
-
-if(
-t==="build"
-){
-
-topColor="#29354b";
-bottom="#0b0e16";
-
-}
-
-
-const g=
-ctx.createLinearGradient(
-0,0,0,H
-);
-
-g.addColorStop(
-0,
-topColor
-);
-
-g.addColorStop(
-1,
-bottom
-);
-
-ctx.fillStyle=g;
-
-ctx.fillRect(
-0,
-0,
-W,
-H
-);
-
-
-/* STARS */
-
-for(
-let i=0;
-i<100;
-i++
-){
-
-const x=
-(
-i*157-
-cameraX*.08
-)%W+W;
-
-const y=
-(
-i*79+
-cameraY*.2
-)%(H*.65);
-
-ctx.globalAlpha=
-.12+
-Math.abs(
-Math.sin(
-gameTime/700+i
-)
-)*.25;
-
-ctx.fillStyle="#fff";
-
-ctx.fillRect(
-x,
-y,
-2,
-2
-);
-
-}
-
-ctx.globalAlpha=1;
-
-
-if(
-t==="island"
-){
-
-ctx.fillStyle=
-"#55d8ff";
-
-ctx.fillRect(
-0,
-H*.78,
-W,
-H*.22
-);
-
-ctx.globalAlpha=.25;
-
-for(
-let x=-
-cameraX%80;
-x<W;
-x+=80
-){
-
-ctx.fillRect(
-x,
-H*.81,
-45,
-3
-);
-
-ctx.fillRect(
-x+25,
-H*.9,
-50,
-3
-);
-
-}
-
-ctx.globalAlpha=1;
-
-}
-
-
-if(
-t==="city"
-){
-
-ctx.fillStyle=
-"#111a35";
-
-for(
-let i=0;
-i<18;
-i++
-){
-
-const x=
-(
-i*260-
-cameraX*.2
-)%W+W;
-
-const h=
-100+
-(i*71%170);
-
-ctx.fillRect(
-x,
-H*.75-h,
-180,
-h
-);
-
-}
-
-}
-
-
-if(
-t==="space"
-){
-
-for(
-let i=0;
-i<5;
-i++
-){
-
-const x=
-(
-i*900-
-cameraX*.12
-)%W+W;
-
-ctx.fillStyle=[
-"#4130a0",
-"#9d2c70",
-"#3c8b8b",
-"#734c2c",
-"#2b527b"
-][i];
-
-ctx.beginPath();
-
-ctx.arc(
-x,
-160+i*70,
-25+i*8,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-}
-
-}
-
-}
-
-
-/* =========================
-   WORLD DRAW
-========================= */
 
 function drawWorld(){
+ for(const d of world.decor){
+  const x=d.x-cam,y=d.y;
+  if(d.t==="tree"){
+   ctx.fillStyle="#63412b";
+   ctx.fillRect(x,y,25,170);
+   ctx.fillStyle="#20905a";
+   ctx.beginPath();ctx.arc(x+12,y,55,0,Math.PI*2);ctx.fill();
+  }
+  if(d.t==="palm"){
+   ctx.strokeStyle="#71452a";
+   ctx.lineWidth=14;
+   ctx.beginPath();ctx.moveTo(x+10,y+150);ctx.lineTo(x,y);ctx.stroke();
+   ctx.fillStyle="#39c466";
+   for(let a=0;a<Math.PI*2;a+=Math.PI/4){
+    ctx.beginPath();
+    ctx.ellipse(x,y,70,11,a,0,Math.PI*2);
+    ctx.fill();
+   }
+  }
+  if(d.t==="window"){
+   ctx.fillStyle="#ffe45d";
+   ctx.shadowBlur=15;
+   ctx.shadowColor="#ffe45d";
+   ctx.fillRect(x,y,16,25);
+   ctx.shadowBlur=0;
+  }
+  if(d.t==="planet"){
+   ctx.fillStyle="#6954d9";
+   ctx.beginPath();ctx.arc(x,y,28,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle="#b9aaff";
+   ctx.lineWidth=5;
+   ctx.beginPath();ctx.ellipse(x,y,48,12,.2,0,Math.PI*2);ctx.stroke();
+  }
+ }
 
-for(
-const d of world.decor
-){
+ for(const s of world.solids){
+  const x=s.x-cam,y=s.y;
+  if(x+s.w<0||x>W)continue;
 
-const x=
-d.x-cameraX;
+  let col="#253b6d";
+  if(s.type==="platform")col="#7658e8";
+  if(s.type==="building")col="#26366a";
+  if(s.type==="ramp")col="#dc4cff";
+  if(s.type==="build")col="#b05cff";
+  ctx.fillStyle=col;
+  ctx.fillRect(x,y,s.w,s.h);
+  ctx.fillStyle="#ffffff16";
+  ctx.fillRect(x,y,s.w,5);
 
-const y=
-d.y-cameraY;
+  if(s.type==="building"){
+   ctx.fillStyle="#ffe35d";
+   for(let xx=x+20;xx<x+s.w-15;xx+=45)
+    for(let yy=y+30;yy<y+s.h-20;yy+=55)
+     ctx.fillRect(xx,yy,15,21);
+  }
+ }
 
-if(
-x<-200||
-x>W+200
-)continue;
+ for(const c of world.coins){
+  if(c.got)continue;
+  const x=c.x-cam,y=c.y;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(time/500);
+  ctx.fillStyle="#ffe34c";
+  ctx.shadowBlur=18;
+  ctx.shadowColor="#ffe34c";
+  ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+ }
 
+ for(const e of world.enemies){
+  if(!e.alive)continue;
+  const x=e.x-cam,y=e.y;
+  ctx.fillStyle="#ff4c70";
+  ctx.beginPath();ctx.roundRect(x,y,e.w,e.h,8);ctx.fill();
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x+7,y+10,6,6);
+  ctx.fillRect(x+23,y+10,6,6);
+ }
 
-if(
-d.type==="tree"
-){
+ const gx=world.goal.x-cam;
+ ctx.fillStyle="#54ff9c";
+ ctx.shadowBlur=25;
+ ctx.shadowColor="#54ff9c";
+ ctx.fillRect(gx,world.goal.y,world.goal.w,world.goal.h);
+ ctx.shadowBlur=0;
 
-ctx.fillStyle=
-"#573a24";
+ drawPlayer();
 
-ctx.fillRect(
-x,
-y,
-28,
-180
-);
-
-ctx.fillStyle=
-"#1d8a50";
-
-ctx.beginPath();
-
-ctx.arc(
-x+14,
-y,
-55,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.fillStyle=
-"#31b866";
-
-ctx.beginPath();
-
-ctx.arc(
-x-18,
-y+35,
-35,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
+ for(const p of particles){
+  ctx.globalAlpha=p.life;
+  ctx.fillStyle=p.color;
+  ctx.beginPath();
+  ctx.arc(p.x-cam,p.y,5*p.life,0,Math.PI*2);
+  ctx.fill();
+ }
+ ctx.globalAlpha=1;
 }
-
-
-if(
-d.type==="palm"
-){
-
-ctx.strokeStyle=
-"#71482b";
-
-ctx.lineWidth=18;
-
-ctx.beginPath();
-
-ctx.moveTo(
-x+20,
-y+150
-);
-
-ctx.lineTo(
-x,
-y
-);
-
-ctx.stroke();
-
-ctx.fillStyle=
-"#35b75e";
-
-for(
-let a=0;
-a<Math.PI*2;
-a+=Math.PI/4
-){
-
-ctx.beginPath();
-
-ctx.ellipse(
-x,
-y,
-75,
-12,
-a,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-}
-
-}
-
-
-if(
-d.type==="car"
-){
-
-ctx.fillStyle=
-"#e84b63";
-
-ctx.fillRect(
-x,
-y,
-100,
-30
-);
-
-ctx.fillStyle=
-"#73dfff";
-
-ctx.fillRect(
-x+20,
-y-20,
-50,
-22
-);
-
-ctx.fillStyle=
-"#080b16";
-
-ctx.beginPath();
-
-ctx.arc(
-x+22,
-y+30,
-14,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.beginPath();
-
-ctx.arc(
-x+78,
-y+30,
-14,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-}
-
-
-if(
-d.type==="light"
-){
-
-ctx.fillStyle=
-"#ffe34c";
-
-ctx.shadowBlur=15;
-
-ctx.shadowColor=
-"#ffe34c";
-
-ctx.fillRect(
-x,
-y,
-12,
-25
-);
-
-ctx.shadowBlur=0;
-
-}
-
-
-if(
-d.type==="planet"
-){
-
-ctx.fillStyle=
-"#6f5ad7";
-
-ctx.beginPath();
-
-ctx.arc(
-x,
-y,
-30,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.strokeStyle=
-"#b5a9ff";
-
-ctx.lineWidth=5;
-
-ctx.beginPath();
-
-ctx.ellipse(
-x,
-y,
-50,
-13,
-.3,
-0,
-Math.PI*2
-);
-
-ctx.stroke();
-
-}
-
-
-if(
-d.type==="spike"
-){
-
-ctx.fillStyle=
-"#ff4f72";
-
-ctx.beginPath();
-
-ctx.moveTo(
-x,
-y+28
-);
-
-ctx.lineTo(
-x+20,
-y
-);
-
-ctx.lineTo(
-x+40,
-y+28
-);
-
-ctx.closePath();
-
-ctx.fill();
-
-}
-
-
-if(
-d.type==="boost"
-){
-
-ctx.fillStyle=
-"#43eaff";
-
-ctx.fillRect(
-x,
-y,
-60,
-18
-);
-
-ctx.fillStyle=
-"#06142b";
-
-ctx.beginPath();
-
-ctx.moveTo(
-x+30,
-y+3
-);
-
-ctx.lineTo(
-x+50,
-y+9
-);
-
-ctx.lineTo(
-x+30,
-y+15
-);
-
-ctx.closePath();
-
-ctx.fill();
-
-}
-
-}
-
-
-/* SOLIDS */
-
-for(
-const s of world.solids
-){
-
-const x=
-s.x-cameraX;
-
-const y=
-s.y-cameraY;
-
-if(
-x+s.w<-100||
-x>W+100
-)continue;
-
-let color=
-"#203968";
-
-if(
-s.type==="building"
-)
-color="#29386e";
-
-if(
-s.type==="platform"
-)
-color="#745be8";
-
-if(
-s.type==="ramp"
-)
-color="#d14fff";
-
-if(
-s.type==="build"
-)
-color="#b45cff";
-
-
-ctx.fillStyle=
-color;
-
-ctx.fillRect(
-x,
-y,
-s.w,
-s.h
-);
-
-ctx.fillStyle=
-"#ffffff18";
-
-ctx.fillRect(
-x,
-y,
-s.w,
-5
-);
-
-
-if(
-s.type==="building"
-){
-
-ctx.fillStyle=
-"#ffe45c";
-
-for(
-let xx=x+20;
-xx<x+s.w-15;
-xx+=45
-){
-
-for(
-let yy=y+30;
-yy<y+s.h-20;
-yy+=55
-){
-
-ctx.fillRect(
-xx,
-yy,
-16,
-22
-);
-
-}
-
-}
-
-}
-
-}
-
-
-/* COINS */
-
-for(
-const c of world.coins
-){
-
-if(c.got)continue;
-
-const x=
-c.x-cameraX;
-
-const y=
-c.y-cameraY;
-
-ctx.save();
-
-ctx.translate(
-x,
-y
-);
-
-ctx.rotate(
-gameTime/600
-);
-
-ctx.shadowBlur=18;
-
-ctx.shadowColor=
-"#ffe34c";
-
-ctx.fillStyle=
-"#ffe34c";
-
-ctx.beginPath();
-
-ctx.arc(
-0,
-0,
-14,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-ctx.strokeStyle=
-"#fff";
-
-ctx.lineWidth=2;
-
-ctx.stroke();
-
-ctx.restore();
-
-}
-
-
-/* ENEMIES */
-
-for(
-const e of world.enemies
-){
-
-if(!e.alive)continue;
-
-const x=
-e.x-cameraX;
-
-const y=
-e.y-cameraY;
-
-ctx.fillStyle=
-"#ff4f6d";
-
-ctx.beginPath();
-
-ctx.roundRect(
-x,
-y,
-e.w,
-e.h,
-8
-);
-
-ctx.fill();
-
-ctx.fillStyle=
-"#fff";
-
-ctx.fillRect(
-x+7,
-y+10,
-7,
-7
-);
-
-ctx.fillRect(
-x+21,
-y+10,
-7,
-7
-);
-
-}
-
-
-/* GOAL */
-
-if(
-world.goal
-){
-
-const x=
-world.goal.x-cameraX;
-
-const y=
-world.goal.y-cameraY;
-
-ctx.shadowBlur=25;
-
-ctx.shadowColor=
-"#5cff9b";
-
-ctx.fillStyle=
-"#5cff9b";
-
-ctx.fillRect(
-x,
-y,
-world.goal.w,
-world.goal.h
-);
-
-ctx.fillStyle=
-"#061b18";
-
-ctx.fillRect(
-x+8,
-y+8,
-world.goal.w-16,
-world.goal.h-16
-);
-
-ctx.shadowBlur=0;
-
-}
-
-
-drawPlayer();
-
-
-/* PARTICLES */
-
-for(
-const p of particles
-){
-
-ctx.globalAlpha=
-p.life;
-
-ctx.fillStyle=
-p.color;
-
-ctx.beginPath();
-
-ctx.arc(
-p.x-cameraX,
-p.y-cameraY,
-4*p.life,
-0,
-Math.PI*2
-);
-
-ctx.fill();
-
-}
-
-ctx.globalAlpha=1;
-
-}
-
-
-/* =========================
-   PLAYER
-========================= */
 
 function drawPlayer(){
+ const x=player.x-cam+17;
+ const y=player.y+24;
+ const skin=skins.find(s=>s[0]===save.skin)||skins[0];
 
-const x=
-player.x-cameraX;
+ let color="#4ceaff";
+ if(save.skin==="fire")color="#ff573d";
+ if(save.skin==="robot")color="#aeb8c8";
+ if(save.skin==="alien")color="#62ff82";
+ if(save.skin==="ninja")color="#765cff";
+ if(save.skin==="ghost")color="#d9ecff";
+ if(save.skin==="star")color="#ffe34c";
+ if(save.skin==="rainbow")color=`hsl(${time/4%360},90%,60%)`;
 
-const y=
-player.y-cameraY;
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.scale(player.dir,1);
+ ctx.shadowBlur=20;
+ ctx.shadowColor=color;
 
-const it=
-items.find(
-i=>i[0]===save.equipped
-)||items[0];
+ ctx.fillStyle=color;
+ ctx.beginPath();
+ ctx.roundRect(-17,-24,34,42,9);
+ ctx.fill();
 
+ ctx.shadowBlur=0;
 
-ctx.save();
+ ctx.fillStyle="#071020";
+ ctx.fillRect(-10,-13,6,7);
+ ctx.fillRect(4,-13,6,7);
+ ctx.fillRect(-8,3,16,4);
 
-ctx.translate(
-x+16,
-y+24
-);
+ if(save.skin==="crown"){
+  ctx.fillStyle="#ffe34c";
+  ctx.beginPath();
+  ctx.moveTo(-17,-24);ctx.lineTo(-11,-40);ctx.lineTo(-3,-29);
+  ctx.lineTo(5,-41);ctx.lineTo(16,-24);ctx.closePath();ctx.fill();
+ }
 
-ctx.scale(
-player.dir,
-1
-);
-
-ctx.shadowBlur=20;
-
-ctx.shadowColor=
-"#4beaff";
-
-
-let body=
-"#45eaff";
-
-
-if(
-it[0]==="fire"
-)
-body="#ff5b3d";
-
-if(
-it[0]==="robot"
-)
-body="#aab6c8";
-
-if(
-it[0]==="alien"
-)
-body="#72ff80";
-
-if(
-it[0]==="ninja"
-)
-body="#6d55ff";
-
-if(
-it[0]==="ghost"
-)
-body="#d8e8ff";
-
-if(
-it[0]==="rainbow"
-)
-body=
-`hsl(${(gameTime/4)%360},90%,60%)`;
-
-if(
-it[0]==="star"
-)
-body="#ffe44d";
-
-
-ctx.fillStyle=
-body;
-
-ctx.beginPath();
-
-ctx.roundRect(
--16,
--24,
-32,
-40,
-8
-);
-
-ctx.fill();
-
-ctx.shadowBlur=0;
-
-
-/* FACE */
-
-ctx.fillStyle=
-"#071021";
-
-ctx.fillRect(
--10,
--13,
-6,
-7
-);
-
-ctx.fillRect(
-4,
--13,
-6,
-7
-);
-
-ctx.fillRect(
--8,
-2,
-16,
-4
-);
-
-
-/* CROWN */
-
-if(
-it[0]==="crown"
-){
-
-ctx.fillStyle=
-"#ffe34c";
-
-ctx.beginPath();
-
-ctx.moveTo(
--15,
--24
-);
-
-ctx.lineTo(
--10,
--39
-);
-
-ctx.lineTo(
--2,
--29
-);
-
-ctx.lineTo(
-5,
--40
-);
-
-ctx.lineTo(
-14,
--24
-);
-
-ctx.closePath();
-
-ctx.fill();
-
+ ctx.restore();
 }
 
-
-/* NINJA */
-
-if(
-it[0]==="ninja"
-){
-
-ctx.fillStyle=
-"#111";
-
-ctx.fillRect(
--18,
--9,
-36,
-12
-);
-
+function loop(now){
+ if(!game)return;
+ const dt=Math.min(40,now-last||16);
+ last=now;
+ update(dt);
+ drawBackground();
+ drawWorld();
+ requestAnimationFrame(loop);
 }
 
-
-ctx.restore();
-
+function toast(text){
+ const t=document.getElementById("toast");
+ t.textContent=text;
+ t.classList.add("show");
+ setTimeout(()=>t.classList.remove("show"),1100);
 }
 
-
-/* =========================
-   GAME LOOP
-========================= */
-
-let last=0;
-
-
-function loop(t){
-
-if(!running)return;
-
-const dt=
-Math.min(
-40,
-t-last||16
-);
-
-last=t;
-
-update(dt);
-
-drawBackground();
-
-drawWorld();
-
-
-if(
-messageTime>0
-){
-
-messageTime-=dt;
-
-ctx.fillStyle=
-"#ffffff";
-
-ctx.font=
-"900 24px Arial";
-
-ctx.textAlign=
-"center";
-
-ctx.fillText(
-message,
-W/2,
-100
-);
-
-}
-
-
-requestAnimationFrame(
-loop
-);
-
-}
-
-
-/* =========================
-   LEAVE
-========================= */
-
-function leaveWorld(){
-
-running=false;
-
-menu.style.display=
-"block";
-
-top.style.display=
-"none";
-
-refreshStats();
-
-}
-
-
-/* =========================
-   PLAY
-========================= */
-
-document.getElementById(
-"play"
-).onclick=()=>{
-startPlace("city");
-};
-
-
-/* =========================
-   CONTEXT MENU
-========================= */
-
-addEventListener(
-"contextmenu",
-e=>e.preventDefault()
-);
-
-
-/* =========================
-   INIT
-========================= */
-
-refreshStats();
-
+updateStats();
 </script>
-
 </body>
 </html>
